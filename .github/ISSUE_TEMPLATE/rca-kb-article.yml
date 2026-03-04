@@ -1,0 +1,154 @@
+name: "Submit KB Article (RCA)"
+description: "Submit a Knowledge Base RCA article for review and publishing to SharePoint KB Index."
+title: "[KB RCA] <Title>"
+labels: ["kb", "submission", "needs-triage"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: Article Title
+      description: "Short, searchable title (what end users would type)."
+      placeholder: "Evidence Offload Stuck on Dashboard"
+    validations:
+      required: true
+
+  - type: input
+    id: article_id
+    attributes:
+      label: Article ID (unique)
+      description: "Unique slug used as the SharePoint upsert key (lowercase, hyphenated)."
+      placeholder: "fleet3-trbl-evidence-offload-stuck"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      options:
+        - "Fleet 3"
+        - "Body 4"
+        - "Axon Respond"
+        - "Axon Evidence"
+        - "Other"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - "Troubleshooting"
+        - "Install Standards"
+        - "Known Issue"
+        - "How-To"
+        - "Release Note / Advisory"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: "Comma-separated tags for search/filtering."
+      placeholder: "evidence.com, netcloud, cradlepoint, offload"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "Low"
+        - "Medium"
+        - "High"
+        - "Critical"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: "Use Draft for early submissions. Published requires validation steps."
+      options:
+        - "Draft"
+        - "Published"
+        - "Deprecated"
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: "Team or individual accountable for validating the article over time."
+      placeholder: "PSM - Central"
+    validations:
+      required: true
+
+  - type: input
+    id: last_verified
+    attributes:
+      label: Last Verified (YYYY-MM-DD)
+      description: "Date this fix/process was last validated."
+      placeholder: "2026-03-03"
+    validations:
+      required: true
+
+  - type: textarea
+    id: client_issue_description
+    attributes:
+      label: 1) Client Issue Description
+      description: "Concise description of what the agency reported (timeline/frequency/background)."
+      placeholder: "The agency reported..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed_symptoms
+    attributes:
+      label: 2) Observed Symptoms
+      description: "What you confirmed during inspection/testing/log review. Use bullets, include replication and log notes."
+      placeholder: "- Symptom 1\n- Symptom 2\n- Engineering log findings\n- Replication details"
+    validations:
+      required: true
+
+  - type: textarea
+    id: root_cause
+    attributes:
+      label: 3) Root Cause
+      description: "Validated, evidence-based root cause."
+      placeholder: "Testing confirmed..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: resolution_performed
+    attributes:
+      label: 4) Resolution Performed
+      description: "Exact corrective actions taken + validation testing performed."
+      placeholder: "- Corrective action 1\n- Corrective action 2\n- Validation testing"
+    validations:
+      required: true
+
+  - type: textarea
+    id: prevention_education
+    attributes:
+      label: 5) Prevention / Education Provided
+      description: "Guidance provided to prevent recurrence (best practices, power/grounding, coordination, monitoring)."
+      placeholder: "- Best practice workflow\n- Power/grounding requirements\n- Monitoring recommendations"
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References / Attachments (optional)
+      description: "Links to cases, tickets, logs, screenshots, diagrams, or related KBs."
+      placeholder: "- Case link\n- Log snippet\n- Related KB"
+    validations:
+      required: false
