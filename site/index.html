@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KB Portal</title>
+  <style>
+    body { font-family: system-ui, Arial; margin: 40px; max-width: 980px; }
+    .row { display:flex; gap:16px; flex-wrap: wrap; }
+    .card { border:1px solid #ddd; border-radius: 12px; padding: 18px; flex: 1; min-width: 320px; }
+    input { width: 100%; padding: 12px; border-radius: 10px; border:1px solid #ccc; }
+    .result { padding: 10px 0; border-bottom: 1px solid #eee; }
+    .meta { color:#666; font-size: 13px; }
+    a { text-decoration: none; }
+    button { padding: 12px 16px; border-radius: 12px; border:0; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <h1>Knowledge Base</h1>
+
+  <div class="row">
+    <div class="card">
+      <h2>Search</h2>
+      <input id="q" placeholder="Search symptoms, tags, product, title..." />
+      <div id="count" class="meta" style="margin-top:10px;"></div>
+      <div id="results" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Submit a KB Ticket</h2>
+      <p class="meta">Creates a GitHub Issue using your RCA Issue Form.</p>
+      <button onclick="newTicket()">Open RCA Ticket Form →</button>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Set these:
+    const OWNER = "YOUR-ORG-OR-USER";
+    const REPO  = "YOUR-REPO";
+    const TEMPLATE = "kb-ticket.yml";
+
+    function newTicket() {
+      const url = `https://github.com/${OWNER}/${REPO}/issues/new?template=${encodeURIComponent(TEMPLATE)}`;
+      window.location.href = url;
+    }
+  </script>
+
+  <script src="./assets/search.js"></script>
+</body>
+</html>
