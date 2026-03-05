@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Axon Fleet Knowledge Base</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body data-page="home">
+
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        AXON
+      </div>
+      <div class="nav-links">
+        <a href="./index.html" class="active">Home</a>
+        <a href="./kb-articles.html">KB Articles</a>
+      </div>
+      <div class="nav-right">
+        <div class="icon">⚙</div>
+        <div class="icon">?</div>
+        <div class="icon">👤</div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="hero">
+      <div class="h1">Axon Fleet Knowledge Base</div>
+      <div class="sub">Find install standards, wiring diagrams, troubleshooting, and best practices.</div>
+
+      <div class="search-wrap" style="margin-top:18px;">
+        <input id="homeSearch" placeholder="Search the knowledge base…" />
+        <button id="homeGo" title="Search">🔍</button>
+      </div>
+
+      <div class="tile-row" id="tileRow"></div>
+    </section>
+
+    <section class="grid-3">
+      <div class="card section">
+        <h3>Recently Updated</h3>
+        <ul class="list" id="recentlyUpdated"></ul>
+      </div>
+
+      <div class="card section">
+        <h3>Most Viewed This Week</h3>
+        <ul class="list" id="mostViewed"></ul>
+      </div>
+
+      <div class="card section">
+        <h3>Critical Alerts / Known Issues</h3>
+        <ul class="list" id="criticalAlerts"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>
