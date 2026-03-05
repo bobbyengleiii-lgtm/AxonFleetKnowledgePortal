@@ -134,7 +134,7 @@ function initHome(index){
   const submit = document.getElementById("submitBtn");
   if (submit){
     submit.addEventListener("click", () => {
-      window.open(`https://github.com/${OWNER}/${REPO}/issues/new?template=${encodeURIComponent(ISSUE_TEMPLATE)}`, "_blank", "noopener");
+      window.open(`https://github.com/${OWNER}/${REPO}/issues/new/choose`, "_blank", "noopener");
     });
   }
 
@@ -222,7 +222,7 @@ function renderHomeList(targetId, items, isAlert){
 function initList(index){
   const submit = document.getElementById("submitBtn");
   submit?.addEventListener("click", () => {
-    window.open(`https://github.com/${OWNER}/${REPO}/issues/new?template=${encodeURIComponent(ISSUE_TEMPLATE)}`, "_blank", "noopener");
+    window.open(`https://github.com/${OWNER}/${REPO}/issues/new/choose`, "_blank", "noopener");
   });
 
   const q = document.getElementById("q");
@@ -323,7 +323,7 @@ function initList(index){
 function initArticle(index){
   const submit = document.getElementById("submitBtn");
   submit?.addEventListener("click", () => {
-    window.open(`https://github.com/${OWNER}/${REPO}/issues/new?template=${encodeURIComponent(ISSUE_TEMPLATE)}`, "_blank", "noopener");
+    window.open(`https://github.com/${OWNER}/${REPO}/issues/new/choose`, "_blank", "noopener");
   });
 
   const id = qs("id");
