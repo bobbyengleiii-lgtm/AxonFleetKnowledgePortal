@@ -1,0 +1,92 @@
+name: Build KB Search Index
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "kb/**"
+      - "site/**"
+      - ".github/workflows/build-search-index.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build search-index.json from kb/*.md
+        run: |
+          python3 - <<'PY'
+          import os, re, json, glob
+
+          def parse_front_matter(text):
+            # Minimal YAML-ish front matter parser for common fields
+            fm = {}
+            m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
+            if not m:
+              return fm, text
+            y, body = m.group(1), m.group(2)
+            for line in y.splitlines():
+              if ":" not in line: 
+                continue
+              k,v = line.split(":",1)
+              k=k.strip(); v=v.strip()
+              fm[k]=v
+            # tags: [a, b]
+            if "tags" in fm:
+              t = fm["tags"]
+              t = t.strip()
+              if t.startswith("[") and t.endswith("]"):
+                inner = t[1:-1].strip()
+                fm["tags"] = [x.strip() for x in inner.split(",") if x.strip()]
+              else:
+                fm["tags"] = [t]
+            return fm, body
+
+          docs = []
+          for path in glob.glob("kb/**/*.md", recursive=True):
+            with open(path, "r", encoding="utf-8") as f:
+              text = f.read()
+
+            fm, body = parse_front_matter(text)
+
+            # Title fallback: first H1
+            title = fm.get("title")
+            if not title:
+              mh1 = re.search(r"^#\s+(.+)$", body, re.M)
+              title = mh1.group(1).strip() if mh1 else os.path.basename(path)
+
+            # Build a URL to the rendered file in Pages.
+            # If you also publish /kb as part of Pages, point to that.
+            # For now, link to GitHub file view as default:
+            url = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/blob/main/{path}"
+
+            docs.append({
+              "title": title,
+              "product": fm.get("product","").strip(),
+              "category": fm.get("category","").strip(),
+              "tags": fm.get("tags", []),
+              "last_verified": fm.get("last_verified","").strip(),
+              "path": path,
+              "url": url,
+              "content": re.sub(r"\s+", " ", body).strip()[:5000],  # cap size
+            })
+
+          os.makedirs("site/assets", exist_ok=True)
+          with open("site/assets/search-index.json", "w", encoding="utf-8") as f:
+            json.dump(docs, f, ensure_ascii=False, indent=2)
+
+          print(f"Wrote {len(docs)} docs to site/assets/search-index.json")
+          PY
+
+      - name: Commit updated index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add site/assets/search-index.json
+          git diff --cached --quiet || git commit -m "Update KB search index"
+          git push
