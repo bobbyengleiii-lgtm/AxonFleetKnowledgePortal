@@ -1,8 +1,8 @@
 // =====================
 // CONFIG
 // =====================
-const OWNER = "YOUR-ORG-OR-USER";
-const REPO  = "YOUR-REPO";
+const OWNER = "bobbyengleiii-lgtm";
+const REPO  = "AxonFleetKnowledgePortal";
 const ISSUE_TEMPLATE = "kb-ticket.yml";
 const INDEX_URL = "./assets/search-index.json";
 
