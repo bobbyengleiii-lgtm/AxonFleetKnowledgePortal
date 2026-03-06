@@ -37,20 +37,20 @@
 
     <div class="card" style="margin-top:12px;">
       <div class="filters">
-        <select id="category" class="select">
+        <select id="categoryFilter" class="select">
           <option value="">All Categories</option>
         </select>
-        <select id="product" class="select">
+        <select id="productFilter" class="select">
           <option value="">All Products</option>
         </select>
-        <select id="status" class="select">
+        <select id="statusFilter" class="select">
           <option value="">All Status</option>
         </select>
-        <select id="tag" class="select">
+        <select id="tagFilter" class="select">
           <option value="">All Tags</option>
         </select>
-        <input id="q" class="input" placeholder="Search…" />
-        <button class="btn" id="clearBtn">Clear</button>
+        <input id="searchInput" class="input" placeholder="Search…" />
+        <button class="btn" id="clearFilters">Clear</button>
       </div>
 
       <div class="table-wrap">
@@ -58,15 +58,15 @@
           <thead>
             <tr>
               <th>Title</th>
-              <th>Category</th>
               <th>Product</th>
-              <th>Updated</th>
-              <th>Owner</th>
+              <th>Category</th>
+              <th>Severity</th>
               <th>Status</th>
-              <th></th>
+              <th>Owner</th>
+              <th>Updated</th>
             </tr>
           </thead>
-          <tbody id="tbody"></tbody>
+          <tbody id="kbTableBody"></tbody>
         </table>
       </div>
     </div>
