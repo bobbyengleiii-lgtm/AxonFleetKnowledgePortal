@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build search-index.json from kb/**/*.md
+      - name: Build search-index.json from kb articles
         run: |
           python3 - <<'PY'
           import os, re, json, glob
@@ -57,7 +57,10 @@ jobs:
 
           docs = []
 
-          for path in sorted(glob.glob("kb/**/*.md", recursive=True)):
+          # catch both .md and .MD
+          paths = glob.glob("kb/**/*.md", recursive=True) + glob.glob("kb/**/*.MD", recursive=True)
+
+          for path in sorted(set(paths)):
               with open(path, "r", encoding="utf-8") as f:
                   text = f.read()
 
@@ -67,8 +70,6 @@ jobs:
               if not title:
                   mh1 = re.search(r"^#\s+(.+)$", body, re.M)
                   title = mh1.group(1).strip() if mh1 else os.path.basename(path)
-
-              url = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/blob/main/{path}"
 
               docs.append({
                   "article_id": unquote(fm.get("article_id", "")),
@@ -81,7 +82,7 @@ jobs:
                   "updated": unquote(fm.get("updated", "")),
                   "last_verified": unquote(fm.get("last_verified", "")),
                   "path": path,
-                  "url": url,
+                  "url": f"./kb-article.html?id={unquote(fm.get('article_id', '')) or path}",
                   "content": body.strip()
               })
 
@@ -92,9 +93,6 @@ jobs:
 
           with open(output_path, "w", encoding="utf-8") as f:
               json.dump(docs, f, ensure_ascii=False, indent=2)
-
-          with open(output_path, "r", encoding="utf-8") as f:
-              json.load(f)
 
           print(f"Wrote valid JSON with {len(docs)} docs to {output_path}")
           PY
