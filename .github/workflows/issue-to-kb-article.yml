@@ -2,7 +2,7 @@ name: Create KB Article File from Submission
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, labeled]
 
 permissions:
   contents: write
@@ -14,7 +14,6 @@ concurrency:
 
 jobs:
   build_kb_file:
-    if: contains(github.event.issue.labels.*.name, 'kb')
     runs-on: ubuntu-latest
 
     steps:
