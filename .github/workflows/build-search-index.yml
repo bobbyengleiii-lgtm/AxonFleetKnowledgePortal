@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - "kb/**"
-      - "site/**"
+      - "assets/**"
       - ".github/workflows/build-search-index.yml"
 
 permissions:
@@ -87,7 +87,7 @@ jobs:
 
           docs.sort(key=lambda d: (d.get("updated") or d.get("last_verified") or ""), reverse=True)
 
-          os.makedirs("site/assets", exist_ok=True)
+          os.makedirs("assets", exist_ok=True)
           output_path = "assets/search-index.json"
 
           with open(output_path, "w", encoding="utf-8") as f:
