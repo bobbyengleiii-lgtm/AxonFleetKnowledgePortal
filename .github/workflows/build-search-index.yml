@@ -56,7 +56,8 @@ jobs:
               return fm, body
 
           docs = []
-          for path in glob.glob("kb/**/*.md", recursive=True):
+
+          for path in sorted(glob.glob("kb/**/*.md", recursive=True)):
               with open(path, "r", encoding="utf-8") as f:
                   text = f.read()
 
@@ -87,10 +88,15 @@ jobs:
           docs.sort(key=lambda d: (d.get("updated") or d.get("last_verified") or ""), reverse=True)
 
           os.makedirs("site/assets", exist_ok=True)
-          with open("site/assets/search-index.json", "w", encoding="utf-8") as f:
+          output_path = "site/assets/search-index.json"
+
+          with open(output_path, "w", encoding="utf-8") as f:
               json.dump(docs, f, ensure_ascii=False, indent=2)
 
-          print(f"Wrote {len(docs)} docs to site/assets/search-index.json")
+          with open(output_path, "r", encoding="utf-8") as f:
+              json.load(f)
+
+          print(f"Wrote valid JSON with {len(docs)} docs to {output_path}")
           PY
 
       - name: Commit updated index
