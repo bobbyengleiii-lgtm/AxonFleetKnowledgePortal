@@ -1,4 +1,4 @@
-name: Create KB Article + Update Search Index
+name: Create KB Article File from Submission
 
 on:
   issues:
@@ -43,31 +43,32 @@ jobs:
                   return ""
               return val
 
-          def clean_scalar(value):
+          def yaml_quote(value):
               if value is None:
                   return '""'
-              value = str(value).strip().replace('"', '\\"')
+              value = str(value).strip()
+              value = value.replace("\\", "\\\\").replace('"', '\\"')
               return f'"{value}"'
 
           def slugify(text):
               return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
-          title         = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
-          article_id    = grab("Article ID (unique)")
-          product       = grab("Product")
-          category      = grab("Category")
-          tags_raw      = grab("Tags")
-          severity      = grab("Severity")
-          status        = grab("Status")
-          owner         = grab("Owner")
-          last_verified = grab("Last Verified (YYYY-MM-DD)")
+          title          = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
+          article_id     = grab("Article ID (unique)")
+          product        = grab("Product")
+          category       = grab("Category")
+          tags_raw       = grab("Tags")
+          severity       = grab("Severity")
+          status         = grab("Status")
+          owner          = grab("Owner")
+          last_verified  = grab("Last Verified (YYYY-MM-DD)")
 
-          client_issue  = grab("1) Client Issue Description")
-          symptoms      = grab("2) Observed Symptoms")
-          root_cause    = grab("3) Root Cause")
-          resolution    = grab("4) Resolution Performed")
-          prevention    = grab("5) Prevention / Education Provided")
-          references    = grab("References / Attachments (optional)")
+          client_issue   = grab("1) Client Issue Description")
+          symptoms       = grab("2) Observed Symptoms")
+          root_cause     = grab("3) Root Cause")
+          resolution     = grab("4) Resolution Performed")
+          prevention     = grab("5) Prevention / Education Provided")
+          references     = grab("References / Attachments (optional)")
 
           if not title:
               title = "Untitled KB Article"
@@ -76,7 +77,7 @@ jobs:
               article_id = slugify(title) or "kb-article"
 
           tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
-          safe_tags = ", ".join(f'"{t.replace(chr(34), chr(92)+chr(34))}"' for t in tags)
+          safe_tags = ", ".join(yaml_quote(t) for t in tags)
 
           issue_no = issue["number"]
           today = datetime.date.today().isoformat()
@@ -89,17 +90,17 @@ jobs:
 
           md = textwrap.dedent(f"""\
           ---
-          article_id: {clean_scalar(article_id)}
-          title: {clean_scalar(title)}
-          product: {clean_scalar(product)}
-          category: {clean_scalar(category)}
+          article_id: {yaml_quote(article_id)}
+          title: {yaml_quote(title)}
+          product: {yaml_quote(product)}
+          category: {yaml_quote(category)}
           tags: [{safe_tags}]
-          severity: {clean_scalar(severity)}
-          status: {clean_scalar(status)}
-          owner: {clean_scalar(owner)}
-          last_verified: {clean_scalar(last_verified)}
-          source_issue: {clean_scalar(issue.get("html_url", ""))}
-          updated: {clean_scalar(today)}
+          severity: {yaml_quote(severity)}
+          status: {yaml_quote(status)}
+          owner: {yaml_quote(owner)}
+          last_verified: {yaml_quote(last_verified)}
+          source_issue: {yaml_quote(issue.get("html_url", ""))}
+          updated: {yaml_quote(today)}
           ---
 
           # {title}
@@ -123,72 +124,17 @@ jobs:
           if references:
               md += f"\n## References / Attachments\n{references}\n"
 
+          md = "\n".join(line.rstrip() for line in md.splitlines()) + "\n"
           out_path.write_text(md, encoding="utf-8")
+
           print(f"Wrote: {out_path}")
           PY
 
-      - name: Build search-index.json
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          import os, re, json, glob
-
-          def parse_front_matter(text):
-            fm = {}
-            m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
-            if not m:
-              return fm, text
-            y, body = m.group(1), m.group(2)
-            for line in y.splitlines():
-              if ":" not in line:
-                continue
-              k, v = line.split(":", 1)
-              fm[k.strip()] = v.strip()
-            if "tags" in fm:
-              t = fm["tags"].strip()
-              if t.startswith("[") and t.endswith("]"):
-                inner = t[1:-1].strip()
-                fm["tags"] = [x.strip().strip('"') for x in inner.split(",") if x.strip()]
-              else:
-                fm["tags"] = [t]
-            return fm, body
-
-          docs = []
-          for path in glob.glob("kb/**/*.md", recursive=True):
-            with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
-            fm, body = parse_front_matter(text)
-            title = fm.get("title")
-            if not title:
-              mh1 = re.search(r"^#\s+(.+)$", body, re.M)
-              title = mh1.group(1).strip() if mh1 else os.path.basename(path)
-
-            url = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/blob/main/{path}"
-
-            docs.append({
-              "title": title.strip('"'),
-              "product": fm.get("product", "").strip().strip('"'),
-              "category": fm.get("category", "").strip().strip('"'),
-              "tags": fm.get("tags", []),
-              "last_verified": fm.get("last_verified", "").strip().strip('"'),
-              "path": path,
-              "url": url,
-              "content": re.sub(r"\s+", " ", body).strip()[:5000],
-            })
-
-          os.makedirs("site/assets", exist_ok=True)
-          with open("site/assets/search-index.json", "w", encoding="utf-8") as f:
-            json.dump(docs, f, ensure_ascii=False, indent=2)
-
-          print(f"Wrote {len(docs)} docs to site/assets/search-index.json")
-          PY
-
-      - name: Commit KB article + search index
+      - name: Commit KB article file
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add kb/articles/*.md site/assets/search-index.json
-          git diff --cached --quiet || git commit -m "KB: add/update article and search index from issue #${{ github.event.issue.number }}"
+          git add kb/articles/*.md
+          git diff --cached --quiet || git commit -m "KB: add/update article from issue #${{ github.event.issue.number }}"
           git push
