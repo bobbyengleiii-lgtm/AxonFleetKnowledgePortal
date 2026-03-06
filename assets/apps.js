@@ -416,6 +416,7 @@ function initArticle(index){
       <div><strong>Product:</strong> ${doc.product || "—"}</div>
       <div><strong>Category:</strong> ${doc.category || "—"}</div>
       <div><strong>Severity:</strong> ${doc.severity || "—"}</div>
+
       <div><strong>Status:</strong> ${doc.status || "—"}</div>
       <div><strong>Owner:</strong> ${doc.owner || "—"}</div>
       <div><strong>Updated:</strong> ${doc.updated ? fmtDate(doc.updated) : "—"}</div>
