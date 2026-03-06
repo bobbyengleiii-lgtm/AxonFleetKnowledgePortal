@@ -89,8 +89,17 @@ function score(doc, q){
 
 async function loadIndex(){
   const res = await fetch(INDEX_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("search-index.json not found. Run workflow / ensure it exists in site/assets.");
-  return res.json();
+  if (!res.ok) throw new Error("search-index.json not found.");
+
+  const text = await res.text();
+  if (!text.trim()) throw new Error("search-index.json is empty.");
+
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Invalid search-index.json:", text);
+    throw new Error("search-index.json is invalid JSON.");
+  }
 }
 
 // Extract key sections from markdown-ish content stored in index
