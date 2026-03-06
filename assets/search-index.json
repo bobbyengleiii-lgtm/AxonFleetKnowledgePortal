@@ -1,5 +1,23 @@
 [
   {
+    "article_id": "swarm-001-fleet-deployment-database-beta",
+    "title": "Fleet Deployment Database (Beta)",
+    "product": "Fleet 3",
+    "category": "Process",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "process"
+    ],
+    "status": "Draft",
+    "owner": "Joe (owner)",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/001-fleet-deployment-database-beta.md",
+    "url": "./kb-article.html?id=swarm-001-fleet-deployment-database-beta",
+    "content": "# Fleet Deployment Database (Beta)\n\n## 1) Client Issue Description\nNeed team feedback/testing to validate new end-to-end deployment workflow database intended to replace Excel/SharePoint templates.\n\n## 2) Observed Symptoms\nSMEs to test mobile workflow (vehicle creation, barcode scan, data upload) and suggest improvements; confirm how installer performance/expectation metrics should be captured.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nBeta access currently limited (Bobby & Alex). Joe plans outreach over coming months; public release target ~6 months.\n\n## 5) Prevention / Education Provided\nJoe to reach out to testers; Team to provide feedback/suggestions; Joe to integrate installer performance data & other Spreadsheet information\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Joe (owner), Alex, Bobby, Jordan, Fleet Masters team\n- Decision needed: N\n- Due: 2026-03-31"
+  },
+  {
     "article_id": "kb-rca-002",
     "title": "[KB RCA]  - 002",
     "product": "Fleet 3",
@@ -12,5 +30,184 @@
     "path": "kb/articles/0012-kb-rca-002.md",
     "url": "./kb-article.html?id=kb-rca-002",
     "content": "# [KB RCA]  - 002\n\n## 1) Client Issue Description\n[KB RCA]  - 002\n\n## 2) Observed Symptoms\n[KB RCA]  - 002\n\n## 3) Root Cause\n[KB RCA]  - 002\n\n## 4) Resolution Performed\n[KB RCA]  - 002\n\n## 5) Prevention / Education Provided\n[KB RCA]  - 002"
+  },
+  {
+    "article_id": "swarm-002-installer-electrical-testing-standards-multimeter-vs-power-probe-test-light",
+    "title": "Installer electrical testing standards (multimeter vs power probe/test light)",
+    "product": "Fleet 3",
+    "category": "Training",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "training"
+    ],
+    "status": "Draft",
+    "owner": "Alex",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/002-installer-electrical-testing-standards-multimeter-vs-power-probe-test-light.md",
+    "url": "./kb-article.html?id=swarm-002-installer-electrical-testing-standards-multimeter-vs-power-probe-test-light",
+    "content": "# Installer electrical testing standards (multimeter vs power probe/test light)\n\n## 1) Client Issue Description\nInconsistent field testing practices; power probes/test lights can cause damage or unsafe diagnostics.\n\n## 2) Observed Symptoms\nAlignment/enforcement with vendors (ProLogic/Insight) and guidance on acceptable 'computer-safe' test lights vs multimeters.\n\n## 3) Root Cause\nRoot cause was identified through team alignment and process review.\n\n## 4) Resolution Performed\nTeam agreed: enforce multimeter use; report misuse to Alex.\n\n## 5) Prevention / Education Provided\nAll: enforce multimeters; report power probe use to Alex; reinforce in install standards/KB\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Alex, Joe, Grant\n- Decision needed: Y\n- Due: 2026-02-25"
+  },
+  {
+    "article_id": "swarm-003-firmware-update-timeout-false-fail-bug-fleet-system",
+    "title": "Firmware update timeout/false-fail bug (Fleet system)",
+    "product": "Fleet 3",
+    "category": "Bug",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "bug"
+    ],
+    "status": "Draft",
+    "owner": "Bobby (owner)",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/003-firmware-update-timeout-false-fail-bug-fleet-system.md",
+    "url": "./kb-article.html?id=swarm-003-firmware-update-timeout-false-fail-bug-fleet-system",
+    "content": "# Firmware update timeout/false-fail bug (Fleet system)\n\n## 1) Client Issue Description\nFirmware update appears to hang/fail due to session timeout/log-in conflicts; may require second attempt though update completed.\n\n## 2) Observed Symptoms\nRepro steps + confirm workaround (monitor via Evidence.com during update); get JIRA updated/new ticket with details.\n\n## 3) Root Cause\nKnown issue; exact software or workflow cause still being validated.\n\n## 4) Resolution Performed\nKnown issue discussed; Austin workaround shared\n\n## 5) Prevention / Education Provided\nBobby reproduce + document + submit/add details to existing/new JIRA; share repro in Fleet Masters Slack\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Bobby (owner), Austin, Joe, Product Eng\n- Decision needed: N\n- Due: 2026-03-04"
+  },
+  {
+    "article_id": "swarm-004-adhesive-delamination-tracking-tau-glass-3-4-5-7-in-1",
+    "title": "Adhesive delamination tracking (Tau glass 3/4/5/7-in-1)",
+    "product": "Fleet 3",
+    "category": "Hardware/Software",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "hardware software"
+    ],
+    "status": "Draft",
+    "owner": "All team members",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/004-adhesive-delamination-tracking-tau-glass-3-4-5-7-in-1.md",
+    "url": "./kb-article.html?id=swarm-004-adhesive-delamination-tracking-tau-glass-3-4-5-7-in-1",
+    "content": "# Adhesive delamination tracking (Tau glass 3/4/5/7-in-1)\n\n## 1) Client Issue Description\nNeed consistent reporting of adhesive falling off/delaminating so Product team can monitor via Salesforce dashboard.\n\n## 2) Observed Symptoms\nConfirm exact reporting steps + ensure everyone follows process; capture photos/agency details.\n\n## 3) Root Cause\nRoot cause was identified through team alignment and process review.\n\n## 4) Resolution Performed\nProcess defined: email Fleeteployments@axon.com with 'adhesive' in subject + create Salesforce case.\n\n## 5) Prevention / Education Provided\nAll: email + case whenever reported; include details/photos; continue to track.\n\n## References / Attachments\nLink / reference: Fleeteployments@axon.com\n\n## Source Notes\n- Swarm board owner / volunteers: All team members, Product\n- Decision needed: N\n- Due: 2026-12-31"
+  },
+  {
+    "article_id": "swarm-005-flip-and-rip-removal-guidelines-airbag-wiring-risk",
+    "title": "Flip & Rip removal guidelines / airbag wiring risk",
+    "product": "Fleet 3",
+    "category": "Upfit",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "upfit"
+    ],
+    "status": "Draft",
+    "owner": "Alex",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/005-flip-and-rip-removal-guidelines-airbag-wiring-risk.md",
+    "url": "./kb-article.html?id=swarm-005-flip-and-rip-removal-guidelines-airbag-wiring-risk",
+    "content": "# Flip & Rip removal guidelines / airbag wiring risk\n\n## 1) Client Issue Description\nImproper removal can leave old wiring under airbags; creates safety/liability risk and refresh delays.\n\n## 2) Observed Symptoms\nEnsure guidelines are followed and exceptions documented; determine where to log/document cases and notify POC.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nAlex released guidelines; team to document any removals where light bar wiring is under airbags and notify POC.\n\n## 5) Prevention / Education Provided\nAll: document in workbook, notify POC, share documentation to protect against claims; reinforce in training/KB\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Alex, Installers, Fleet Masters\n- Decision needed: N\n- Due: 2026-02-28"
+  },
+  {
+    "article_id": "swarm-006-pre-removal-video-offload-from-hubs-refreshes",
+    "title": "Pre-removal video offload from hubs (refreshes)",
+    "product": "Fleet 3",
+    "category": "Process",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "process"
+    ],
+    "status": "Draft",
+    "owner": "Bobby",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/006-pre-removal-video-offload-from-hubs-refreshes.md",
+    "url": "./kb-article.html?id=swarm-006-pre-removal-video-offload-from-hubs-refreshes",
+    "content": "# Pre-removal video offload from hubs (refreshes)\n\n## 1) Client Issue Description\nRisk of data loss if old Fleet 3 hardware removed before videos are offloaded.\n\n## 2) Observed Symptoms\nStandardize pre-removal checklist + reminders to installers/partners.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nTeam reminder: ensure all videos offloaded before removal; Bobby cited recent TPL handoff needing extra work.\n\n## 5) Prevention / Education Provided\nAll: add to removal checklist and enforce; call out noncompliance in QC notes.\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Bobby, Joe, Installers\n- Decision needed: N\n- Due: 2026-02-28"
+  },
+  {
+    "article_id": "swarm-007-reactivation-sensitivity-setting-left-at-default-delay",
+    "title": "Reactivation sensitivity setting left at default delay",
+    "product": "Fleet 3",
+    "category": "Process",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "process"
+    ],
+    "status": "Draft",
+    "owner": "Joe",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/007-reactivation-sensitivity-setting-left-at-default-delay.md",
+    "url": "./kb-article.html?id=swarm-007-reactivation-sensitivity-setting-left-at-default-delay",
+    "content": "# Reactivation sensitivity setting left at default delay\n\n## 1) Client Issue Description\nImmediate activation often desired by agencies, but setting left deselected (30-60 Second delay) causes operational delays.\n\n## 2) Observed Symptoms\nConfirm default standard + exceptions; embed into QC / config checklist.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nJoe notes most agencies want immediate activation; Alex mentioned exceptions when directed by POC.\n\n## 5) Prevention / Education Provided\nAll: Have the conversation with the POC regarding this feature to see if they actually would indeed want this disabled\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Joe, Alex, Bobby\n- Decision needed: Y\n- Due: 2026-02-28"
+  },
+  {
+    "article_id": "swarm-008-agency-apn-sim-configuration-confusion-wrong-apn-evidence-com-profile-setup",
+    "title": "Agency APN/SIM configuration confusion (wrong APN) + Evidence.com profile setup",
+    "product": "Fleet 3",
+    "category": "Training",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "training"
+    ],
+    "status": "Draft",
+    "owner": "Bobby (KB owner)",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/008-agency-apn-sim-configuration-confusion-wrong-apn-evidence-com-profile-setup.md",
+    "url": "./kb-article.html?id=swarm-008-agency-apn-sim-configuration-confusion-wrong-apn-evidence-com-profile-setup",
+    "content": "# Agency APN/SIM configuration confusion (wrong APN) + Evidence.com profile setup\n\n## 1) Client Issue Description\nAgencies may use incorrect APN/SIM config and misunderstand Evidence.com profile/ownership, blocking dashboard access and adoption.\n\n## 2) Observed Symptoms\nCreate KB article documenting Austin case, best practices, and potential solution (IP range settings/traffic steering) to reduce APN dependence.\n\n## 3) Root Cause\nLikely caused by a known configuration, workflow, or product behavior identified during team review.\n\n## 4) Resolution Performed\nAustin resolved wrong APN scenario; discussed Evidence.com individual profiles; Alex proposed IP range/traffic steering approach.\n\n## 5) Prevention / Education Provided\nBobby: write KB article from transcript + share in Fleet KB/Slack; Austin/Alex explore client solution options.\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Bobby (KB owner), Austin, Alex\n- Decision needed: N\n- Due: 2026-03-11"
+  },
+  {
+    "article_id": "swarm-009-central-repository-for-ai-transcripts-recordings",
+    "title": "Central repository for AI transcripts/recordings",
+    "product": "Fleet 3",
+    "category": "Process",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "process"
+    ],
+    "status": "Draft",
+    "owner": "Alex (owner)",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/009-central-repository-for-ai-transcripts-recordings.md",
+    "url": "./kb-article.html?id=swarm-009-central-repository-for-ai-transcripts-recordings",
+    "content": "# Central repository for AI transcripts/recordings\n\n## 1) Client Issue Description\nNeed consistent storage so absent team members can review meeting recordings/transcripts.\n\n## 2) Observed Symptoms\nWhere to store (SharePoint folder path) and notify team to review via Slack.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nAlex to create SharePoint folder in team folder for AI transcripts & recordings; notify team.\n\n## 5) Prevention / Education Provided\nAlex create folder + announce; Bobby post recordings/transcripts in Fleet Slack channel for access.\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Alex (owner), Team\n- Decision needed: N\n- Due: 2026-02-25"
+  },
+  {
+    "article_id": "swarm-010-travel-contingencies-expense-reporting-cadence",
+    "title": "Travel contingencies + expense reporting cadence",
+    "product": "Fleet 3",
+    "category": "Process",
+    "tags": [
+      "swarm-board",
+      "fleet3",
+      "process"
+    ],
+    "status": "Draft",
+    "owner": "Alex",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/010-travel-contingencies-expense-reporting-cadence.md",
+    "url": "./kb-article.html?id=swarm-010-travel-contingencies-expense-reporting-cadence",
+    "content": "# Travel contingencies + expense reporting cadence\n\n## 1) Client Issue Description\nWeather can cause flight cancellations/delays; need standard comms and on-time expense submissions.\n\n## 2) Observed Symptoms\nClarify escalation path and required comms when travel delays occur; standardize expense entry format/purpose code.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nAlex: communicate delays with him + agency; use Fleet Masters channel before wider escalations; expenses due end of every Monday w/ correct CKO code.\n\n## 5) Prevention / Education Provided\nAll: message Alex+agency if delayed; post issues in Fleet Masters channel; submit expenses by Monday (tag agency + correct purpose code).\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Alex, All team members\n- Decision needed: N\n- Due: 2026-01-26"
+  },
+  {
+    "article_id": "swarm-011-proper-grounding-and-how-to-test-if-it-is-a-good-ground",
+    "title": "Proper Grounding and how to test if it is a good ground",
+    "product": "Fleet 3",
+    "category": "Swarm",
+    "tags": [
+      "swarm-board",
+      "fleet3"
+    ],
+    "status": "Draft",
+    "owner": "Bobby",
+    "updated": "2026-03-06",
+    "last_verified": "",
+    "path": "kb/articles/011-proper-grounding-and-how-to-test-if-it-is-a-good-ground.md",
+    "url": "./kb-article.html?id=swarm-011-proper-grounding-and-how-to-test-if-it-is-a-good-ground",
+    "content": "# Proper Grounding and how to test if it is a good ground\n\n## 1) Client Issue Description\nIf a ground is installed with having high resistance it can cause numorous issues with Fleet3\n\n## 2) Observed Symptoms\nClarified/asked team to ensure everyone knows how to properly test if it’s a good ground (Using Multimeter set it to ohms and put one lead on your ground stud and the other lead on the chassis of the vehicle), you should have less then .03 ohms reading to be a proper ground if the number is higher then 1 then do not use this as your ground for Fleet3.\n\n## 3) Root Cause\nUnder investigation.\n\n## 4) Resolution Performed\nClarified/asked team to ensure everyone knows how to properly test if it’s a good ground (Using Multimeter set it to ohms and put one lead on your ground stud and the other lead on the chassis of the vehicle), you should have less then .03 ohms reading to be a proper ground if the number is higher then 1 then do not use this as your ground for Fleet3.\n\n## 5) Prevention / Education Provided\nCreate KB Article\n\n## References / Attachments\nNo direct link included in the source board.\n\n## Source Notes\n- Swarm board owner / volunteers: Bobby\n- Decision needed: N\n- Due: Not provided"
   }
 ]
