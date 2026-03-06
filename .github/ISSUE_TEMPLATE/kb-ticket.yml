@@ -1,13 +1,13 @@
 name: "Submit KB Article (RCA)"
-description: "Submit a Knowledge Base RCA article for review and publishing to SharePoint KB Index."
-title: "[KB RCA] <Title>"
+description: "Submit a Knowledge Base RCA article for review and publishing."
+title: "[KB RCA] "
 labels: ["kb", "submission", "needs-triage"]
 body:
   - type: input
-    id: title
+    id: article_title
     attributes:
       label: Article Title
-      description: "Short, searchable title (what end users would type)."
+      description: "Short, searchable title for the KB article."
       placeholder: "Evidence Offload Stuck on Dashboard"
     validations:
       required: true
@@ -16,35 +16,32 @@ body:
     id: article_id
     attributes:
       label: Article ID (unique)
-      description: "Unique slug used as the SharePoint upsert key (lowercase, hyphenated)."
+      description: "Unique lowercase/hyphenated slug used for the KB article."
       placeholder: "fleet3-trbl-evidence-offload-stuck"
     validations:
-      required: true
+      required: false
 
   - type: dropdown
     id: product
     attributes:
       label: Product
       options:
-        - "Fleet 3"
-        - "Body 4"
-        - "Axon Respond"
-        - "Axon Evidence"
-        - "Other"
+        - Fleet 3
+        - Body 4
+        - Axon Respond
+        - Axon Evidence
+        - TASER
+        - Interview
+        - Other
     validations:
       required: true
 
-  - type: dropdown
+  - type: input
     id: category
     attributes:
       label: Category
-      options:
-        - "Troubleshooting"
-        - "Install Standards"
-        - "Known Issue"
-        - "How-To"
-        - "Release Note / Advisory"
-        - "Other"
+      description: "Primary troubleshooting category."
+      placeholder: "Networking"
     validations:
       required: true
 
@@ -52,59 +49,60 @@ body:
     id: tags
     attributes:
       label: Tags
-      description: "Comma-separated tags for search/filtering."
-      placeholder: "evidence.com, netcloud, cradlepoint, offload"
+      description: "Comma-separated search tags."
+      placeholder: "wifi offload, static ip, evidence sync, cradlepoint"
     validations:
-      required: true
+      required: false
 
   - type: dropdown
     id: severity
     attributes:
       label: Severity
       options:
-        - "Low"
-        - "Medium"
-        - "High"
-        - "Critical"
+        - Low
+        - Medium
+        - High
+        - Critical
     validations:
-      required: true
+      required: false
 
   - type: dropdown
     id: status
     attributes:
       label: Status
-      description: "Use Draft for early submissions. Published requires validation steps."
       options:
-        - "Draft"
-        - "Published"
-        - "Deprecated"
+        - Draft
+        - Review Needed
+        - Approved
+        - Published
     validations:
-      required: true
+      required: false
 
   - type: input
     id: owner
     attributes:
       label: Owner
-      description: "Team or individual accountable for validating the article over time."
-      placeholder: "PSM - Central"
+      description: "Person responsible for the article."
+      placeholder: "Bobby Engle"
     validations:
-      required: true
+      required: false
 
   - type: input
     id: last_verified
     attributes:
       label: Last Verified (YYYY-MM-DD)
-      description: "Date this fix/process was last validated."
-      placeholder: "2026-03-03"
+      description: "Date this issue/resolution was last confirmed."
+      placeholder: "2026-03-05"
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: client_issue_description
     attributes:
       label: 1) Client Issue Description
-      description: "Concise description of what the agency reported (timeline/frequency/background)."
-      placeholder: "The agency reported..."
+      description: "What the client reported, including timeline/frequency/context."
+      placeholder: |
+        The agency reported intermittent random camera activations occurring across multiple vehicles following initial installation.
     validations:
       required: true
 
@@ -112,8 +110,11 @@ body:
     id: observed_symptoms
     attributes:
       label: 2) Observed Symptoms
-      description: "What you confirmed during inspection/testing/log review. Use bullets, include replication and log notes."
-      placeholder: "- Symptom 1\n- Symptom 2\n- Engineering log findings\n- Replication details"
+      description: "What was confirmed during inspection, testing, or log review."
+      placeholder: |
+        - Random activations occurred with ignition state changes
+        - Trigger input showed unstable voltage
+        - Behavior was repeatable on multiple vehicles
     validations:
       required: true
 
@@ -121,8 +122,9 @@ body:
     id: root_cause
     attributes:
       label: 3) Root Cause
-      description: "Validated, evidence-based root cause."
-      placeholder: "Testing confirmed..."
+      description: "Underlying reason the issue occurred."
+      placeholder: |
+        A miswired trigger source introduced unstable voltage to the activation input, causing false activations.
     validations:
       required: true
 
@@ -130,8 +132,9 @@ body:
     id: resolution_performed
     attributes:
       label: 4) Resolution Performed
-      description: "Exact corrective actions taken + validation testing performed."
-      placeholder: "- Corrective action 1\n- Corrective action 2\n- Validation testing"
+      description: "Exactly what was changed or corrected."
+      placeholder: |
+        Verified wiring path, moved trigger source to the proper ignition reference, retested system operation, and confirmed normal activation behavior.
     validations:
       required: true
 
@@ -139,8 +142,9 @@ body:
     id: prevention_education
     attributes:
       label: 5) Prevention / Education Provided
-      description: "Guidance provided to prevent recurrence (best practices, power/grounding, coordination, monitoring)."
-      placeholder: "- Best practice workflow\n- Power/grounding requirements\n- Monitoring recommendations"
+      description: "Steps given to prevent recurrence."
+      placeholder: |
+        Advised installer to validate trigger voltage before final termination and follow the Golden Standard wiring checklist for future installs.
     validations:
       required: true
 
@@ -148,7 +152,10 @@ body:
     id: references
     attributes:
       label: References / Attachments (optional)
-      description: "Links to cases, tickets, logs, screenshots, diagrams, or related KBs."
-      placeholder: "- Case link\n- Log snippet\n- Related KB"
+      description: "Paste links, ticket numbers, screenshots, logs, or related notes."
+      placeholder: |
+        Jira: AXON-12345
+        NetCloud screenshots attached
+        Related RCA: fleet3-trigger-voltage-instability
     validations:
       required: false
