@@ -25,17 +25,12 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          import json, re, datetime, pathlib
+          import json, re, datetime, pathlib, textwrap
 
           issue = json.loads(r'''${{ toJson(github.event.issue) }}''')
           body = issue.get("body", "")
 
           def grab(heading):
-              """
-              GitHub Issue Forms render sections like:
-              ### <Label>
-              <value>
-              """
               m = re.search(
                   rf"^###\s+{re.escape(heading)}\s*\n+([\s\S]*?)(?=\n###\s+|\Z)",
                   body,
@@ -50,16 +45,13 @@ jobs:
 
           def clean_scalar(value):
               if value is None:
-                  return ""
-              value = str(value).strip()
-              # Keep YAML front matter safe for colons, hashes, quotes, etc.
-              value = value.replace('"', '\\"')
+                  return '""'
+              value = str(value).strip().replace('"', '\\"')
               return f'"{value}"'
 
           def slugify(text):
               return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
-          # Match your current Issue Form labels
           title         = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
           article_id    = grab("Article ID (unique)")
           product       = grab("Product")
@@ -95,7 +87,8 @@ jobs:
           out_dir.mkdir(parents=True, exist_ok=True)
           out_path = out_dir / filename
 
-          md = f"""---
+          md = textwrap.dedent(f"""\
+          ---
           article_id: {clean_scalar(article_id)}
           title: {clean_scalar(title)}
           product: {clean_scalar(product)}
@@ -125,14 +118,10 @@ jobs:
 
           ## 5) Prevention / Education Provided
           {prevention}
-          """
+          """)
 
           if references:
-              md += f"""
-
-          ## References / Attachments
-          {references}
-          """
+              md += f"\n## References / Attachments\n{references}\n"
 
           md = "\n".join(line.rstrip() for line in md.splitlines()) + "\n"
           out_path.write_text(md, encoding="utf-8")
