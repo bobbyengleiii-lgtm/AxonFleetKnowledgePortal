@@ -1,18 +1,10 @@
 [
   {
-  "article_id": "...",
-  "title": "...",
-  "product": "...",
-  "category": "...",
-  "tags": ["..."],
-  "status": "...",
-  "owner": "...",
-  "updated": "...",
-  "last_verified": "...",
-  "path": "...",
-  "url": "...",
-  "content": "..."
-}
+    "title": "{{TITLE}}",
+    "product": "{{PRODUCT}}",
+    "category": "{{CATEGORY}}",
+    "tags": [
+      "{{TAGS_CSV}}"
     ],
     "last_verified": "{{LAST_VERIFIED}}",
     "path": "kb/articles/ARTICLE_ID-title.md",
