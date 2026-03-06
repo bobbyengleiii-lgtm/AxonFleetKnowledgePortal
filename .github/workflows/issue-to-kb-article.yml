@@ -1,4 +1,4 @@
-name: Create KB Article File from Submission
+name: Create KB Article + Update Search Index
 
 on:
   issues:
@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   build_kb_file:
+    if: contains(github.event.issue.labels.*.name, 'kb')
     runs-on: ubuntu-latest
 
     steps:
@@ -122,17 +123,72 @@ jobs:
           if references:
               md += f"\n## References / Attachments\n{references}\n"
 
-          md = "\n".join(line.rstrip() for line in md.splitlines()) + "\n"
           out_path.write_text(md, encoding="utf-8")
-
           print(f"Wrote: {out_path}")
           PY
 
-      - name: Commit KB article file
+      - name: Build search-index.json
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os, re, json, glob
+
+          def parse_front_matter(text):
+            fm = {}
+            m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
+            if not m:
+              return fm, text
+            y, body = m.group(1), m.group(2)
+            for line in y.splitlines():
+              if ":" not in line:
+                continue
+              k, v = line.split(":", 1)
+              fm[k.strip()] = v.strip()
+            if "tags" in fm:
+              t = fm["tags"].strip()
+              if t.startswith("[") and t.endswith("]"):
+                inner = t[1:-1].strip()
+                fm["tags"] = [x.strip().strip('"') for x in inner.split(",") if x.strip()]
+              else:
+                fm["tags"] = [t]
+            return fm, body
+
+          docs = []
+          for path in glob.glob("kb/**/*.md", recursive=True):
+            with open(path, "r", encoding="utf-8") as f:
+              text = f.read()
+
+            fm, body = parse_front_matter(text)
+            title = fm.get("title")
+            if not title:
+              mh1 = re.search(r"^#\s+(.+)$", body, re.M)
+              title = mh1.group(1).strip() if mh1 else os.path.basename(path)
+
+            url = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/blob/main/{path}"
+
+            docs.append({
+              "title": title.strip('"'),
+              "product": fm.get("product", "").strip().strip('"'),
+              "category": fm.get("category", "").strip().strip('"'),
+              "tags": fm.get("tags", []),
+              "last_verified": fm.get("last_verified", "").strip().strip('"'),
+              "path": path,
+              "url": url,
+              "content": re.sub(r"\s+", " ", body).strip()[:5000],
+            })
+
+          os.makedirs("site/assets", exist_ok=True)
+          with open("site/assets/search-index.json", "w", encoding="utf-8") as f:
+            json.dump(docs, f, ensure_ascii=False, indent=2)
+
+          print(f"Wrote {len(docs)} docs to site/assets/search-index.json")
+          PY
+
+      - name: Commit KB article + search index
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add kb/articles/*.md
-          git diff --cached --quiet || git commit -m "KB: add/update article from issue #${{ github.event.issue.number }}"
+          git add kb/articles/*.md site/assets/search-index.json
+          git diff --cached --quiet || git commit -m "KB: add/update article and search index from issue #${{ github.event.issue.number }}"
           git push
