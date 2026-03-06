@@ -10,7 +10,7 @@ const VIEW_KEY = "kb_views_v1";         // { [idOrUrl]: {count, lastViewedISO} }
 const RECENT_KEY = "kb_recent_v1";      // [{title,url,updated,product,category,status}]
 const RECENT_MAX = 6;
 
-// Categories shown as tiles on Home (match your mock)
+// Categories shown as tiles on Home
 const HOME_TILES = [
   { label: "Golden Standard Installs", icon: "⚙️", filter: { category: "Install Standards" } },
   { label: "Troubleshooting",          icon: "🛠️", filter: { category: "Troubleshooting" } },
@@ -25,9 +25,9 @@ const HOME_TILES = [
 function qs(name){ return new URLSearchParams(location.search).get(name) || ""; }
 function norm(s){ return (s || "").toString().toLowerCase(); }
 function uniq(arr){ return [...new Set(arr)].filter(Boolean); }
+
 function fmtDate(iso){
   if (!iso) return "";
-  // Accept YYYY-MM-DD or ISO
   const d = new Date(iso.length === 10 ? iso + "T00:00:00" : iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString(undefined, { month:"short", day:"numeric" });
@@ -51,10 +51,12 @@ function bumpView(doc){
 function getRecent(){
   try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch { return []; }
 }
-function setRecent(list){ localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, RECENT_MAX))); }
+function setRecent(list){
+  localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, RECENT_MAX)));
+}
 function addRecent(doc){
   const key = doc.article_id || doc.path || doc.url;
-  const existing = getRecent().filter(x => (x.key !== key));
+  const existing = getRecent().filter(x => x.key !== key);
   existing.unshift({
     key,
     title: doc.title,
@@ -70,9 +72,10 @@ function addRecent(doc){
 function score(doc, q){
   const nq = norm(q);
   if (!nq) return 0;
+
   const title = norm(doc.title);
   const tags  = norm((doc.tags || []).join(" "));
-  const meta  = norm([doc.product, doc.category, doc.owner, doc.status].join(" "));
+  const meta  = norm([doc.product, doc.category, doc.owner, doc.status, doc.severity].join(" "));
   const body  = norm(doc.content);
 
   let s = 0;
@@ -101,42 +104,25 @@ async function loadIndex(){
     throw new Error("search-index.json is invalid JSON.");
   }
 }
-// Extract key sections from markdown-ish content stored in index
+
 function extractSection(content, heading){
-  // heading like "Client Issue Description"
-  const re = new RegExp(`\\n##\\s+${heading}\\s*\\n([\\s\\S]*?)(\\n##\\s+|$)`, "i");
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`\\n##\\s+${escapedHeading}\\s*\\n([\\s\\S]*?)(\\n##\\s+|$)`, "i");
   const m = (content || "").match(re);
   return m ? m[1].trim() : "";
 }
+
 function extractH1(content){
   const m = (content || "").match(/^#\s+(.+)$/m);
   return m ? m[1].trim() : "";
 }
+
 function bulletsFrom(text){
-  // grab "- item" lines; fallback split sentences
   const lines = (text || "").split("\n").map(x => x.trim());
   const bullets = lines.filter(x => x.startsWith("- ")).map(x => x.slice(2).trim());
-  return bullets.length ? bullets : lines.filter(Boolean).slice(0,8);
+  return bullets.length ? bullets : lines.filter(Boolean).slice(0, 8);
 }
 
-// =====================
-// Routing
-// =====================
-(async function init(){
-  const page = document.body.getAttribute("data-page");
-  const index = await loadIndex();
-
-  if (page === "home") return initHome(index);
-  if (page === "list") return initList(index);
-  if (page === "article") return initArticle(index);
-})().catch(err => {
-  const el = document.getElementById("statusText");
-  if (el) el.textContent = `Error: ${err.message}`;
-});
-
-// =====================
-// HOME
-// =====================
 function htmlFromSection(text){
   if (!text || !text.trim()) return "—";
 
@@ -152,50 +138,74 @@ function htmlFromSection(text){
     .join("");
 }
 
-  // Search bar -> list page with q=
+// =====================
+// Routing
+// =====================
+(async function init(){
+  const page = document.body.getAttribute("data-page");
+  const index = await loadIndex();
+
+  if (page === "home") return initHome(index);
+  if (page === "list") return initList(index);
+  if (page === "article") return initArticle(index);
+})().catch(err => {
+  const el = document.getElementById("statusText");
+  if (el) el.textContent = `Error: ${err.message}`;
+  console.error(err);
+});
+
+// =====================
+// HOME
+// =====================
+function initHome(index){
   const q = document.getElementById("homeSearch");
   const go = document.getElementById("homeGo");
-  const run = () => location.href = `./kb-articles.html?q=${encodeURIComponent(q.value.trim())}`;
-  q?.addEventListener("keydown", e => { if (e.key === "Enter") run(); });
+
+  const run = () => {
+    location.href = `./kb-articles.html?q=${encodeURIComponent(q?.value?.trim() || "")}`;
+  };
+
+  q?.addEventListener("keydown", e => {
+    if (e.key === "Enter") run();
+  });
   go?.addEventListener("click", run);
 
-  // Tiles
   const tiles = document.getElementById("tileRow");
-  tiles.innerHTML = HOME_TILES.map(t => `
-    <div class="tile" data-cat="${t.filter.category}">
-      <div class="t-ico">${t.icon}</div>
-      <div class="t-text">${t.label}</div>
-    </div>
-  `).join("");
-  tiles.querySelectorAll(".tile").forEach(tile => {
-    tile.addEventListener("click", () => {
-      const cat = tile.getAttribute("data-cat");
-      location.href = `./kb-articles.html?category=${encodeURIComponent(cat)}`;
-    });
-  });
+  if (tiles){
+    tiles.innerHTML = HOME_TILES.map(t => `
+      <div class="tile" data-cat="${t.filter.category}">
+        <div class="t-ico">${t.icon}</div>
+        <div class="t-text">${t.label}</div>
+      </div>
+    `).join("");
 
-  // Recently Updated (by updated/last_verified)
+    tiles.querySelectorAll(".tile").forEach(tile => {
+      tile.addEventListener("click", () => {
+        const cat = tile.getAttribute("data-cat");
+        location.href = `./kb-articles.html?category=${encodeURIComponent(cat)}`;
+      });
+    });
+  }
+
   const updated = index
     .slice()
     .sort((a,b) => (b.updated || b.last_verified || "").localeCompare(a.updated || a.last_verified || ""))
-    .slice(0,3);
+    .slice(0, 3);
 
-  // Most viewed this week (local views, lastViewed within 7 days)
   const views = getViews();
-  const cutoff = Date.now() - 7*24*60*60*1000;
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const byViews = index
     .map(d => {
       const key = d.article_id || d.path || d.url;
-      const v = views[key] || {count:0, lastViewedISO:""};
+      const v = views[key] || { count: 0, lastViewedISO: "" };
       const last = v.lastViewedISO ? new Date(v.lastViewedISO).getTime() : 0;
       const eligible = last >= cutoff;
       return { ...d, _views: eligible ? v.count : 0 };
     })
-    .sort((a,b) => (b._views - a._views))
+    .sort((a,b) => b._views - a._views)
     .filter(d => d._views > 0)
-    .slice(0,3);
+    .slice(0, 3);
 
-  // Critical Alerts (status === "Alert" or category contains "Known Issues" or tags contains "alert")
   const alerts = index
     .filter(d =>
       norm(d.status) === "alert" ||
@@ -203,7 +213,7 @@ function htmlFromSection(text){
       (d.tags || []).some(t => norm(t).includes("alert"))
     )
     .sort((a,b) => (b.updated || b.last_verified || "").localeCompare(a.updated || a.last_verified || ""))
-    .slice(0,3);
+    .slice(0, 3);
 
   renderHomeList("recentlyUpdated", updated, false);
   renderHomeList("mostViewed", byViews.length ? byViews : updated, false);
@@ -231,7 +241,98 @@ function renderHomeList(targetId, items, isAlert){
 }
 
 // =====================
-// LIST (KB Articles)
+// LIST
+// =====================
+function initList(index){
+  const submit = document.getElementById("submitBtn");
+  submit?.addEventListener("click", () => {
+    window.open(`https://github.com/${OWNER}/${REPO}/issues/new/choose`, "_blank", "noopener");
+  });
+
+  const q = document.getElementById("searchInput");
+  const category = document.getElementById("categoryFilter");
+  const product = document.getElementById("productFilter");
+  const status = document.getElementById("statusFilter");
+  const tag = document.getElementById("tagFilter");
+  const clear = document.getElementById("clearFilters");
+  const tbody = document.getElementById("kbTableBody");
+  const statusText = document.getElementById("statusText");
+
+  if (!tbody) return;
+
+  const categories = uniq(index.map(d => d.category).filter(Boolean)).sort();
+  const products = uniq(index.map(d => d.product).filter(Boolean)).sort();
+  const statuses = uniq(index.map(d => d.status).filter(Boolean)).sort();
+  const tags = uniq(index.flatMap(d => d.tags || []).filter(Boolean)).sort();
+
+  if (category) category.innerHTML = `<option value="">All</option>` + categories.map(x => `<option value="${x}">${x}</option>`).join("");
+  if (product) product.innerHTML = `<option value="">All</option>` + products.map(x => `<option value="${x}">${x}</option>`).join("");
+  if (status) status.innerHTML = `<option value="">All</option>` + statuses.map(x => `<option value="${x}">${x}</option>`).join("");
+  if (tag) tag.innerHTML = `<option value="">All</option>` + tags.map(x => `<option value="${x}">${x}</option>`).join("");
+
+  const qParam = qs("q");
+  const categoryParam = qs("category");
+
+  if (q && qParam) q.value = qParam;
+  if (category && categoryParam) category.value = categoryParam;
+
+  function run(){
+    const qv = q?.value?.trim() || "";
+    const cv = category?.value || "";
+    const pv = product?.value || "";
+    const sv = status?.value || "";
+    const tv = tag?.value || "";
+
+    let rows = index.filter(d => {
+      if (cv && d.category !== cv) return false;
+      if (pv && d.product !== pv) return false;
+      if (sv && d.status !== sv) return false;
+      if (tv && !(d.tags || []).includes(tv)) return false;
+      if (qv && score(d, qv) <= 0) return false;
+      return true;
+    });
+
+    if (qv){
+      rows = rows.sort((a,b) => score(b, qv) - score(a, qv));
+    } else {
+      rows = rows.sort((a,b) => (b.updated || b.last_verified || "").localeCompare(a.updated || a.last_verified || ""));
+    }
+
+    tbody.innerHTML = rows.length ? rows.map(d => `
+      <tr>
+        <td><a href="./kb-article.html?id=${encodeURIComponent(d.article_id || d.path || d.url)}">${d.title || "Untitled"}</a></td>
+        <td>${d.product || "—"}</td>
+        <td>${d.category || "—"}</td>
+        <td>${d.severity || "—"}</td>
+        <td>${d.status || "—"}</td>
+        <td>${d.owner || "—"}</td>
+        <td>${d.updated ? fmtDate(d.updated) : (d.last_verified ? fmtDate(d.last_verified) : "—")}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="7">No articles found.</td></tr>`;
+
+    if (statusText) statusText.textContent = `${rows.length} article(s)`;
+  }
+
+  q?.addEventListener("input", run);
+  category?.addEventListener("change", run);
+  product?.addEventListener("change", run);
+  status?.addEventListener("change", run);
+  tag?.addEventListener("change", run);
+
+  clear?.addEventListener("click", () => {
+    if (q) q.value = "";
+    if (category) category.value = "";
+    if (product) product.value = "";
+    if (status) status.value = "";
+    if (tag) tag.value = "";
+    run();
+  });
+
+  run();
+}
+
+// =====================
+// ARTICLE
 // =====================
 function initArticle(index){
   const submit = document.getElementById("submitBtn");
@@ -259,8 +360,8 @@ function initArticle(index){
   const articleDetailsEl = document.getElementById("articleDetails");
 
   if (!doc){
-    titleEl.textContent = "Article not found";
-    metaEl.textContent = "Check the id parameter and ensure the index contains this article.";
+    if (titleEl) titleEl.textContent = "Article not found";
+    if (metaEl) metaEl.textContent = "Check the id parameter and ensure the index contains this article.";
     return;
   }
 
@@ -274,22 +375,23 @@ function initArticle(index){
   const preventionEducation = extractSection(doc.content || "", "5) Prevention / Education Provided");
   const references = extractSection(doc.content || "", "References / Attachments");
 
-  titleEl.textContent = doc.title || extractH1(doc.content) || "KB Article";
+  if (titleEl) titleEl.textContent = doc.title || extractH1(doc.content) || "KB Article";
 
-  metaEl.textContent = [
-    doc.product ? `Product: ${doc.product}` : "",
-    doc.category ? `Category: ${doc.category}` : "",
-    doc.severity ? `Severity: ${doc.severity}` : "",
-    doc.status ? `Status: ${doc.status}` : "",
-    doc.updated ? `Updated: ${fmtDate(doc.updated)}` : "",
-    doc.last_verified ? `Last Verified: ${fmtDate(doc.last_verified)}` : "",
-    doc.owner ? `Owner: ${doc.owner}` : ""
-  ].filter(Boolean).join("  •  ");
+  if (metaEl){
+    metaEl.textContent = [
+      doc.product ? `Product: ${doc.product}` : "",
+      doc.category ? `Category: ${doc.category}` : "",
+      doc.severity ? `Severity: ${doc.severity}` : "",
+      doc.status ? `Status: ${doc.status}` : "",
+      doc.updated ? `Updated: ${fmtDate(doc.updated)}` : "",
+      doc.last_verified ? `Last Verified: ${fmtDate(doc.last_verified)}` : "",
+      doc.owner ? `Owner: ${doc.owner}` : ""
+    ].filter(Boolean).join("  •  ");
+  }
 
-  summaryEl.textContent =
-    clientIssue ||
-    doc.summary ||
-    "—";
+  if (summaryEl){
+    summaryEl.textContent = clientIssue || doc.summary || "—";
+  }
 
   const applies = [
     doc.product,
@@ -297,136 +399,40 @@ function initArticle(index){
     ...(doc.tags || [])
   ].filter(Boolean);
 
-  appliesEl.innerHTML = `<ul>${applies.map(x => `<li>${x}</li>`).join("")}</ul>`;
-
-  clientIssueEl.innerHTML = htmlFromSection(clientIssue);
-  observedSymptomsEl.innerHTML = htmlFromSection(observedSymptoms);
-  rootCauseEl.innerHTML = htmlFromSection(rootCause);
-  resolutionPerformedEl.innerHTML = htmlFromSection(resolutionPerformed);
-  preventionEducationEl.innerHTML = htmlFromSection(preventionEducation);
-  referencesEl.innerHTML = htmlFromSection(references);
-
-  articleDetailsEl.innerHTML = `
-    <div><strong>Article ID:</strong> ${doc.article_id || "—"}</div>
-    <div><strong>Product:</strong> ${doc.product || "—"}</div>
-    <div><strong>Category:</strong> ${doc.category || "—"}</div>
-    <div><strong>Severity:</strong> ${doc.severity || "—"}</div>
-    <div><strong>Status:</strong> ${doc.status || "—"}</div>
-    <div><strong>Owner:</strong> ${doc.owner || "—"}</div>
-    <div><strong>Updated:</strong> ${doc.updated ? fmtDate(doc.updated) : "—"}</div>
-    <div><strong>Last Verified:</strong> ${doc.last_verified ? fmtDate(doc.last_verified) : "—"}</div>
-    <div><strong>Tags:</strong> ${(doc.tags || []).length ? doc.tags.join(", ") : "—"}</div>
-    ${
-      doc.source_issue
-        ? `<div style="margin-top:10px;"><a class="rowlink" href="${doc.source_issue}" target="_blank" rel="noopener">Open source issue</a></div>`
-        : ""
-    }
-  `;
-
-  sourceEl.href = doc.source_issue || "#";
-  sourceEl.textContent = doc.source_issue ? "Open source issue (GitHub)" : "Source link unavailable";
-
-  document.getElementById("yesBtn").addEventListener("click", () => alert("Thanks — feedback recorded locally."));
-  document.getElementById("noBtn").addEventListener("click", () => alert("Thanks — feedback recorded locally."));
-  document.getElementById("requestBtn").addEventListener("click", () => {
-    const t = encodeURIComponent(`[KB Update Request] ${doc.title}`);
-    window.open(`https://github.com/${OWNER}/${REPO}/issues/new?title=${t}&labels=kb,update-request`, "_blank", "noopener");
-  });
-}
-
-  q.addEventListener("input", run);
-  category.addEventListener("change", run);
-  product.addEventListener("change", run);
-  status.addEventListener("change", run);
-  tag.addEventListener("change", run);
-
-  clear.addEventListener("click", () => {
-    q.value = "";
-    category.value = "";
-    product.value = "";
-    status.value = "";
-    tag.value = "";
-    run();
-  });
-
-  run();
-}
-
-// =====================
-// ARTICLE
-// =====================
-function initArticle(index){
-  const submit = document.getElementById("submitBtn");
-  submit?.addEventListener("click", () => {
-    window.open(`https://github.com/${OWNER}/${REPO}/issues/new/choose`, "_blank", "noopener");
-  });
-
-  const id = qs("id");
-  const doc = index.find(d => (d.article_id || d.path || d.url) === id)
-           || index.find(d => d.url === id)
-           || null;
-
-  const titleEl = document.getElementById("title");
-  const metaEl = document.getElementById("meta");
-  const summaryEl = document.getElementById("summary");
-  const appliesEl = document.getElementById("applies");
-  const stepsEl = document.getElementById("steps");
-  const attachmentsEl = document.getElementById("attachments");
-  const sourceEl = document.getElementById("sourceLink");
-
-  if (!doc){
-    titleEl.textContent = "Article not found";
-    metaEl.textContent = "Check the id parameter and ensure the index contains this article.";
-    return;
+  if (appliesEl){
+    appliesEl.innerHTML = `<ul>${applies.map(x => `<li>${x}</li>`).join("")}</ul>`;
   }
 
-  bumpView(doc);
-  addRecent(doc);
+  if (clientIssueEl) clientIssueEl.innerHTML = htmlFromSection(clientIssue);
+  if (observedSymptomsEl) observedSymptomsEl.innerHTML = htmlFromSection(observedSymptoms);
+  if (rootCauseEl) rootCauseEl.innerHTML = htmlFromSection(rootCause);
+  if (resolutionPerformedEl) resolutionPerformedEl.innerHTML = htmlFromSection(resolutionPerformed);
+  if (preventionEducationEl) preventionEducationEl.innerHTML = htmlFromSection(preventionEducation);
+  if (referencesEl) referencesEl.innerHTML = htmlFromSection(references);
 
-  titleEl.textContent = doc.title || extractH1(doc.content) || "KB Article";
-  metaEl.textContent = [
-    doc.product ? `Product: ${doc.product}` : "",
-    doc.category ? `Category: ${doc.category}` : "",
-    doc.updated || doc.last_verified ? `Updated: ${fmtDate(doc.updated || doc.last_verified)}` : "",
-    doc.owner ? `Owner: ${doc.owner}` : "",
-    doc.status ? `Status: ${doc.status}` : ""
-  ].filter(Boolean).join("  •  ");
+  if (articleDetailsEl){
+    articleDetailsEl.innerHTML = `
+      <div><strong>Article ID:</strong> ${doc.article_id || "—"}</div>
+      <div><strong>Product:</strong> ${doc.product || "—"}</div>
+      <div><strong>Category:</strong> ${doc.category || "—"}</div>
+      <div><strong>Severity:</strong> ${doc.severity || "—"}</div>
+      <div><strong>Status:</strong> ${doc.status || "—"}</div>
+      <div><strong>Owner:</strong> ${doc.owner || "—"}</div>
+      <div><strong>Updated:</strong> ${doc.updated ? fmtDate(doc.updated) : "—"}</div>
+      <div><strong>Last Verified:</strong> ${doc.last_verified ? fmtDate(doc.last_verified) : "—"}</div>
+      <div><strong>Tags:</strong> ${(doc.tags || []).length ? doc.tags.join(", ") : "—"}</div>
+      ${doc.source_issue ? `<div style="margin-top:10px;"><a class="rowlink" href="${doc.source_issue}" target="_blank" rel="noopener">Open source issue</a></div>` : ""}
+    `;
+  }
 
-  // Try to pull a one-line summary from front matter (doc.summary) or first paragraph
-  const firstPara = (doc.content || "").split("\n").find(x => x.trim() && !x.trim().startsWith("#")) || "";
-  summaryEl.textContent = doc.summary || firstPara.trim().slice(0, 180) || "—";
+  if (sourceEl){
+    sourceEl.href = doc.source_issue || doc.url || "#";
+    sourceEl.textContent = doc.source_issue ? "Open source issue (GitHub)" : "Open source (GitHub)";
+  }
 
-  // Applies To: from optional front matter field OR infer from tags/product
-  const applies = doc.applies_to && Array.isArray(doc.applies_to) ? doc.applies_to
-    : [
-        doc.product || "Fleet",
-        ...(doc.tags || []).slice(0,3)
-      ].filter(Boolean);
-
-  appliesEl.innerHTML = `<ul>${applies.map(x => `<li>${x}</li>`).join("")}</ul>`;
-
-  // Steps: if your markdown includes "## Steps" section, parse bullets/numbered lines
-  const stepsText = extractSection(doc.content || "", "Steps") || extractSection(doc.content || "", "Resolution Performed");
-  const steps = bulletsFrom(stepsText).slice(0, 10);
-
-  stepsEl.innerHTML = steps.length
-    ? `<ol>${steps.map(s => `<li>${s.replace(/^\d+\.\s*/,"")}</li>`).join("")}</ol>`
-    : `<p>Steps not found in index content. Add a <strong>## Steps</strong> section to the markdown.</p>`;
-
-  // Attachments: optional front matter in index as attachments: [{name,url}]
-  const atts = Array.isArray(doc.attachments) ? doc.attachments : [];
-  attachmentsEl.innerHTML = atts.length
-    ? `<div class="attach">${atts.map(a => `<div>☑ <a href="${a.url}" target="_blank" rel="noopener">${a.name}</a></div>`).join("")}</div>`
-    : `<div class="meta">No attachments listed.</div>`;
-
-  sourceEl.href = doc.url;
-  sourceEl.textContent = "Open source (GitHub)";
-
-  // Helpful buttons
-  document.getElementById("yesBtn").addEventListener("click", () => alert("Thanks — feedback recorded locally."));
-  document.getElementById("noBtn").addEventListener("click", () => alert("Thanks — feedback recorded locally."));
-  document.getElementById("requestBtn").addEventListener("click", () => {
-    // Opens a new issue (you can swap to a dedicated “request-update” template if you make one)
+  document.getElementById("yesBtn")?.addEventListener("click", () => alert("Thanks — feedback recorded locally."));
+  document.getElementById("noBtn")?.addEventListener("click", () => alert("Thanks — feedback recorded locally."));
+  document.getElementById("requestBtn")?.addEventListener("click", () => {
     const t = encodeURIComponent(`[KB Update Request] ${doc.title}`);
     window.open(`https://github.com/${OWNER}/${REPO}/issues/new?title=${t}&labels=kb,update-request`, "_blank", "noopener");
   });
