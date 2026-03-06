@@ -89,7 +89,7 @@ function score(doc, q){
 
 async function loadIndex(){
   const res = await fetch(INDEX_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("search-index.json not found. Run workflow / ensure it exists in site/assets.");
+  if (!res.ok) throw new Error("search-index.json not found. Run workflow / ensure it exists in /assets.");
 
   const text = await res.text();
   if (!text.trim()) throw new Error("search-index.json is empty.");
