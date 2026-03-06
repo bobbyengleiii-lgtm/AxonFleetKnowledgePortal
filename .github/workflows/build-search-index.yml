@@ -88,7 +88,7 @@ jobs:
           docs.sort(key=lambda d: (d.get("updated") or d.get("last_verified") or ""), reverse=True)
 
           os.makedirs("site/assets", exist_ok=True)
-          output_path = "site/assets/search-index.json"
+          output_path = "assets/search-index.json"
 
           with open(output_path, "w", encoding="utf-8") as f:
               json.dump(docs, f, ensure_ascii=False, indent=2)
@@ -103,6 +103,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add site/assets/search-index.json
+          git add assets/search-index.json
           git diff --cached --quiet || git commit -m "Update KB search index"
           git push
