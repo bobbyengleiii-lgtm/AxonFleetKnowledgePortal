@@ -1,1 +1,25 @@
+---
+article_id: "template"
+title: "KB Article Template"
+product: "Fleet 3"
+category: "Troubleshooting"
+tags: ["template"]
+severity: ""
+status: "Draft"
+owner: ""
+last_verified: ""
+source_issue: ""
+updated: ""
+---
 
+# KB Article Template
+
+## 1) Client Issue Description
+
+## 2) Observed Symptoms
+
+## 3) Root Cause
+
+## 4) Resolution Performed
+
+## 5) Prevention / Education Provided
