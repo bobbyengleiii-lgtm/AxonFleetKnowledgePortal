@@ -53,28 +53,30 @@ jobs:
           def slugify(text):
               return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
-          title          = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
-          article_id     = grab("Article ID (unique)")
-          product        = grab("Product")
-          category       = grab("Category")
-          tags_raw       = grab("Tags")
-          severity       = grab("Severity")
-          status         = grab("Status")
-          owner          = grab("Owner")
-          last_verified  = grab("Last Verified (YYYY-MM-DD)")
+          title = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
+          raw_article_id = grab("Article ID (unique)")
+          product = grab("Product")
+          category = grab("Category")
+          tags_raw = grab("Tags")
+          severity = grab("Severity")
+          status = grab("Status")
+          owner = grab("Owner")
+          last_verified = grab("Last Verified (YYYY-MM-DD)")
 
-          client_issue   = grab("1) Client Issue Description")
-          symptoms       = grab("2) Observed Symptoms")
-          root_cause     = grab("3) Root Cause")
-          resolution     = grab("4) Resolution Performed")
-          prevention     = grab("5) Prevention / Education Provided")
-          references     = grab("References / Attachments (optional)")
+          client_issue = grab("1) Client Issue Description")
+          symptoms = grab("2) Observed Symptoms")
+          root_cause = grab("3) Root Cause")
+          resolution = grab("4) Resolution Performed")
+          prevention = grab("5) Prevention / Education Provided")
+          references = grab("References / Attachments (optional)")
 
           if not title:
               title = "Untitled KB Article"
 
-          if not article_id:
-              article_id = slugify(title) or "kb-article"
+          if not raw_article_id:
+              raw_article_id = title
+
+          article_id = slugify(raw_article_id) or slugify(title) or "kb-article"
 
           tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
           safe_tags = ", ".join(yaml_quote(t) for t in tags)
