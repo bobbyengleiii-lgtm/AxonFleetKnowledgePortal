@@ -4,7 +4,7 @@
 const OWNER = "bobbyengleiii-lgtm";
 const REPO  = "AxonFleetKnowledgePortal";
 const ISSUE_TEMPLATE = "kb-ticket.yml";
-const INDEX_URL = "./assets/search-index.json";
+const INDEX_URL = "./sites/assets/search-index.json";
 
 const VIEW_KEY = "kb_views_v1";         // { [idOrUrl]: {count, lastViewedISO} }
 const RECENT_KEY = "kb_recent_v1";      // [{title,url,updated,product,category,status}]
