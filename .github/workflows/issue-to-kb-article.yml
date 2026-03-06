@@ -8,68 +8,87 @@ permissions:
   contents: write
   issues: read
 
+concurrency:
+  group: kb-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   build_kb_file:
-    # Only run for KB submission issues (your form applies these labels)
     if: contains(github.event.issue.labels.*.name, 'kb')
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Convert Issue Form -> kb/articles/*.md
+        shell: bash
         run: |
           python3 - <<'PY'
-          import json, re, os, datetime, pathlib
+          import json, re, datetime, pathlib
 
           issue = json.loads(r'''${{ toJson(github.event.issue) }}''')
-          body = issue.get("body","")
+          body = issue.get("body", "")
 
           def grab(heading):
-            """
-            GitHub Issue Forms render as markdown sections:
-            ### <Label>
-            <value>
-            """
-            m = re.search(rf"^###\s+{re.escape(heading)}\s*\n+([\s\S]*?)(?=\n###\s+|\Z)", body, re.M)
-            if not m:
-              return ""
-            val = m.group(1).strip()
-            if val.lower() == "_no response_":
-              return ""
-            return val
+              """
+              GitHub Issue Forms render sections like:
+              ### <Label>
+              <value>
+              """
+              m = re.search(
+                  rf"^###\s+{re.escape(heading)}\s*\n+([\s\S]*?)(?=\n###\s+|\Z)",
+                  body,
+                  re.M
+              )
+              if not m:
+                  return ""
+              val = m.group(1).strip()
+              if val.lower() == "_no response_":
+                  return ""
+              return val
 
-          # --- Match YOUR EXACT labels ---
-          title        = grab("Article Title") or issue.get("title","").replace("[KB RCA]","").strip()
-          article_id   = grab("Article ID (unique)")
-          product      = grab("Product")
-          category     = grab("Category")
-          tags_raw     = grab("Tags")
-          severity     = grab("Severity")
-          status       = grab("Status")
-          owner        = grab("Owner")
-          last_verified= grab("Last Verified (YYYY-MM-DD)")
+          def clean_scalar(value):
+              if value is None:
+                  return ""
+              value = str(value).strip()
+              # Keep YAML front matter safe for colons, hashes, quotes, etc.
+              value = value.replace('"', '\\"')
+              return f'"{value}"'
 
-          client_issue = grab("1) Client Issue Description")
-          symptoms     = grab("2) Observed Symptoms")
-          root_cause   = grab("3) Root Cause")
-          resolution   = grab("4) Resolution Performed")
-          prevention   = grab("5) Prevention / Education Provided")
-          references   = grab("References / Attachments (optional)")
+          def slugify(text):
+              return re.sub(r"[^a-z0-9]+", "-", (text or "").lower()).strip("-")
 
-          # Normalize tags -> YAML list
-          tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
+          # Match your current Issue Form labels
+          title         = grab("Article Title") or issue.get("title", "").replace("[KB RCA]", "").strip()
+          article_id    = grab("Article ID (unique)")
+          product       = grab("Product")
+          category      = grab("Category")
+          tags_raw      = grab("Tags")
+          severity      = grab("Severity")
+          status        = grab("Status")
+          owner         = grab("Owner")
+          last_verified = grab("Last Verified (YYYY-MM-DD)")
 
-          # Fallbacks
+          client_issue  = grab("1) Client Issue Description")
+          symptoms      = grab("2) Observed Symptoms")
+          root_cause    = grab("3) Root Cause")
+          resolution    = grab("4) Resolution Performed")
+          prevention    = grab("5) Prevention / Education Provided")
+          references    = grab("References / Attachments (optional)")
+
+          if not title:
+              title = "Untitled KB Article"
+
           if not article_id:
-            # slugify title if user forgot
-            slug = re.sub(r"[^a-z0-9]+", "-", (title or "kb-article").lower()).strip("-")
-            article_id = slug
+              article_id = slugify(title) or "kb-article"
+
+          tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
+          safe_tags = ", ".join(f'"{t.replace(chr(34), chr(92)+chr(34))}"' for t in tags)
 
           issue_no = issue["number"]
           today = datetime.date.today().isoformat()
 
-          # Filename keeps issue number + article_id for uniqueness
           filename = f"{issue_no:04d}-{article_id}.md"
 
           out_dir = pathlib.Path("kb/articles")
@@ -77,17 +96,17 @@ jobs:
           out_path = out_dir / filename
 
           md = f"""---
-          article_id: {article_id}
-          title: {title}
-          product: {product}
-          category: {category}
-          tags: [{", ".join(tags)}]
-          severity: {severity}
-          status: {status}
-          owner: {owner}
-          last_verified: {last_verified}
-          source_issue: {issue.get("html_url","")}
-          updated: {today}
+          article_id: {clean_scalar(article_id)}
+          title: {clean_scalar(title)}
+          product: {clean_scalar(product)}
+          category: {clean_scalar(category)}
+          tags: [{safe_tags}]
+          severity: {clean_scalar(severity)}
+          status: {clean_scalar(status)}
+          owner: {clean_scalar(owner)}
+          last_verified: {clean_scalar(last_verified)}
+          source_issue: {clean_scalar(issue.get("html_url", ""))}
+          updated: {clean_scalar(today)}
           ---
 
           # {title}
@@ -106,19 +125,23 @@ jobs:
 
           ## 5) Prevention / Education Provided
           {prevention}
-
-          ## References / Attachments
-          {references if references else ""}
           """
 
-          # clean trailing spaces + ensure newline
-          md = "\n".join([line.rstrip() for line in md.splitlines()]) + "\n"
+          if references:
+              md += f"""
+
+          ## References / Attachments
+          {references}
+          """
+
+          md = "\n".join(line.rstrip() for line in md.splitlines()) + "\n"
           out_path.write_text(md, encoding="utf-8")
 
           print(f"Wrote: {out_path}")
           PY
 
-      - name: Commit kb article file
+      - name: Commit KB article file
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
