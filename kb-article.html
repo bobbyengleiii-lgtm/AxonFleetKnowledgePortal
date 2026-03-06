@@ -27,53 +27,78 @@
     </div>
   </div>
 
-  <main class="container">
-    <div class="card article">
-      <h1 id="title">Loading…</h1>
-      <div class="meta-line" id="meta"></div>
-      <div class="hr"></div>
+ <main class="container">
+  <div class="card article">
+    <h1 id="title">Loading…</h1>
+    <div class="meta-line" id="meta"></div>
+    <div class="hr"></div>
 
+    <div class="kv">
+      <h3>Summary</h3>
+      <p id="summary">—</p>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="article-grid">
       <div class="kv">
-        <h3>Summary</h3>
-        <p id="summary">—</p>
+        <h3>Applies To</h3>
+        <div id="applies"></div>
+
+        <div class="hr"></div>
+
+        <h3>1) Client Issue Description</h3>
+        <div id="clientIssue">—</div>
+
+        <div class="hr"></div>
+
+        <h3>2) Observed Symptoms</h3>
+        <div id="observedSymptoms">—</div>
+
+        <div class="hr"></div>
+
+        <h3>3) Root Cause</h3>
+        <div id="rootCause">—</div>
+
+        <div class="hr"></div>
+
+        <h3>4) Resolution Performed</h3>
+        <div id="resolutionPerformed">—</div>
+
+        <div class="hr"></div>
+
+        <h3>5) Prevention / Education Provided</h3>
+        <div id="preventionEducation">—</div>
+
+        <div class="hr"></div>
+
+        <h3>References / Attachments</h3>
+        <div id="references">—</div>
+
+        <div class="hr"></div>
+
+        <a id="sourceLink" class="rowlink" href="#" target="_blank" rel="noopener">Open source (GitHub)</a>
       </div>
 
-      <div class="hr"></div>
-
-      <div class="article-grid">
-        <div class="kv">
-          <h3>Applies To</h3>
-          <div id="applies"></div>
-
-          <div class="hr"></div>
-
-          <h3>Steps</h3>
-          <div id="steps"></div>
-
-          <div class="hr"></div>
-
-          <a id="sourceLink" class="rowlink" href="#" target="_blank" rel="noopener">Open source (GitHub)</a>
+      <aside class="side">
+        <div class="box">
+          <h3>Article Details</h3>
+          <div id="articleDetails"></div>
         </div>
 
-        <aside class="side">
-          <div class="box">
-            <h3>Attachments</h3>
-            <div id="attachments"></div>
+        <div class="box">
+          <h3>Was this helpful?</h3>
+          <div class="help-row">
+            <button class="btn primary" id="yesBtn">Yes</button>
+            <button class="btn" id="noBtn">No</button>
           </div>
-
-          <div class="box">
-            <h3>Was this helpful?</h3>
-            <div class="help-row">
-              <button class="btn primary" id="yesBtn">Yes</button>
-              <button class="btn" id="noBtn">No</button>
-            </div>
-            <button class="btn" style="margin-top:10px; width:100%;" id="requestBtn">Request Update</button>
-            <div class="note">Feedback is stored locally for now (no backend).</div>
-          </div>
-        </aside>
-      </div>
+          <button class="btn" style="margin-top:10px; width:100%;" id="requestBtn">Request Update</button>
+          <div class="note">Feedback is stored locally for now (no backend).</div>
+        </div>
+      </aside>
     </div>
-  </main>
+  </div>
+</main>
 
   <script src="./assets/apps.js"></script>
 </body>
